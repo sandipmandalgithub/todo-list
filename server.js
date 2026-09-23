@@ -63,13 +63,38 @@ app.get("/api/todos", async (req, res) => {
     }
 });
 
+// Get Todo by ID
+app.get("/api/todos/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const todo = await Todo.findById(id);
+
+        if (!todo) {
+            return res.status(404).json({
+                message: "Todo not found"
+            });
+        }
+
+        res.status(200).json({
+            todo
+        });
+    } catch (error) {
+        console.error("Error fetching todo:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch todo"
+        });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
             serverSelectionTimeoutMS: 10000,
-            tls: true
+            // tls: true
         });
 
         console.log("MongoDB connected successfully!");
