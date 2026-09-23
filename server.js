@@ -163,6 +163,32 @@ app.patch("/api/todos/:id/complete", async (req, res) => {
     }
 });
 
+// Delete Todo
+app.delete("/api/todos/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const todo = await Todo.findByIdAndDelete(id);
+
+        if (!todo) {
+            return res.status(404).json({
+                message: "Todo not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Todo deleted successfully",
+            todo
+        });
+    } catch (error) {
+        console.error("Error deleting todo:", error);
+
+        res.status(500).json({
+            message: "Failed to delete todo"
+        });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
