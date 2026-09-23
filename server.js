@@ -88,13 +88,55 @@ app.get("/api/todos/:id", async (req, res) => {
     }
 });
 
+// Update Todo
+app.put("/api/todos/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description } = req.body;
+
+        if (!title) {
+            return res.status(400).json({
+                message: "Title is required"
+            });
+        }
+
+        const todo = await Todo.findByIdAndUpdate(
+            id,
+            {
+                title,
+                description
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!todo) {
+            return res.status(404).json({
+                message: "Todo not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Todo updated successfully",
+            todo
+        });
+    } catch (error) {
+        console.error("Error updating todo:", error);
+
+        res.status(500).json({
+            message: "Failed to update todo"
+        });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 10000,
-            // tls: true
+            serverSelectionTimeoutMS: 10000
         });
 
         console.log("MongoDB connected successfully!");
