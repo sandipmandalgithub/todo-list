@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
+const Todo = require("./models/Todo");
+
 dotenv.config();
 
 const app = express();
@@ -12,6 +14,35 @@ app.get("/", (req, res) => {
     res.json({
         message: "Todo List API is running successfully!"
     });
+});
+
+// Create Todo
+app.post("/api/todos", async (req, res) => {
+    try {
+        const { title, description } = req.body;
+
+        if (!title) {
+            return res.status(400).json({
+                message: "Title is required"
+            });
+        }
+
+        const todo = await Todo.create({
+            title,
+            description
+        });
+
+        res.status(201).json({
+            message: "Todo created successfully",
+            todo
+        });
+    } catch (error) {
+        console.error("Error creating todo:", error);
+
+        res.status(500).json({
+            message: "Failed to create todo"
+        });
+    }
 });
 
 const PORT = process.env.PORT || 5000;
