@@ -131,6 +131,38 @@ app.put("/api/todos/:id", async (req, res) => {
     }
 });
 
+// Complete / Uncomplete Todo
+app.patch("/api/todos/:id/complete", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const todo = await Todo.findById(id);
+
+        if (!todo) {
+            return res.status(404).json({
+                message: "Todo not found"
+            });
+        }
+
+        todo.completed = !todo.completed;
+
+        await todo.save();
+
+        res.status(200).json({
+            message: todo.completed
+                ? "Todo marked as completed"
+                : "Todo marked as incomplete",
+            todo
+        });
+    } catch (error) {
+        console.error("Error updating todo completion:", error);
+
+        res.status(500).json({
+            message: "Failed to update todo completion"
+        });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
