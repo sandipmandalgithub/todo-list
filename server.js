@@ -45,6 +45,24 @@ app.post("/api/todos", async (req, res) => {
     }
 });
 
+// Get All Todos
+app.get("/api/todos", async (req, res) => {
+    try {
+        const todos = await Todo.find().sort({ createdAt: -1 });
+
+        res.status(200).json({
+            count: todos.length,
+            todos
+        });
+    } catch (error) {
+        console.error("Error fetching todos:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch todos"
+        });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
