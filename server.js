@@ -8,36 +8,56 @@ dotenv.config();
 
 const app = express();
 
+
+// =========================
+// Middleware
+// =========================
+
 app.use(express.json());
+
 app.use(express.static("public"));
 
+
+// =========================
+// Home Route
+// =========================
+
 app.get("/", (req, res) => {
-    res.json({
-        message: "Todo List API is running successfully!"
-    });
+    res.sendFile(__dirname + "/public/index.html");
 });
 
+
+// =========================
 // Create Todo
+// =========================
+
 app.post("/api/todos", async (req, res) => {
+
     try {
+
         const { title, description } = req.body;
 
-        if (!title) {
+        if (!title || !title.trim()) {
+
             return res.status(400).json({
                 message: "Title is required"
             });
         }
 
         const todo = await Todo.create({
-            title,
-            description
+            title: title.trim(),
+            description: description
+                ? description.trim()
+                : ""
         });
 
         res.status(201).json({
             message: "Todo created successfully",
             todo
         });
+
     } catch (error) {
+
         console.error("Error creating todo:", error);
 
         res.status(500).json({
@@ -46,16 +66,26 @@ app.post("/api/todos", async (req, res) => {
     }
 });
 
+
+// =========================
 // Get All Todos
+// =========================
+
 app.get("/api/todos", async (req, res) => {
+
     try {
-        const todos = await Todo.find().sort({ createdAt: -1 });
+
+        const todos = await Todo
+            .find()
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             count: todos.length,
             todos
         });
+
     } catch (error) {
+
         console.error("Error fetching todos:", error);
 
         res.status(500).json({
@@ -64,12 +94,19 @@ app.get("/api/todos", async (req, res) => {
     }
 });
 
+
+// =========================
 // Search Todos
+// =========================
+
 app.get("/api/todos/search", async (req, res) => {
+
     try {
+
         const { keyword } = req.query;
 
         if (!keyword || !keyword.trim()) {
+
             return res.status(400).json({
                 message: "Keyword is required"
             });
@@ -77,28 +114,32 @@ app.get("/api/todos/search", async (req, res) => {
 
         const searchKeyword = keyword.trim();
 
-        const todos = await Todo.find({
-            $or: [
-                {
-                    title: {
-                        $regex: searchKeyword,
-                        $options: "i"
+        const todos = await Todo
+            .find({
+                $or: [
+                    {
+                        title: {
+                            $regex: searchKeyword,
+                            $options: "i"
+                        }
+                    },
+                    {
+                        description: {
+                            $regex: searchKeyword,
+                            $options: "i"
+                        }
                     }
-                },
-                {
-                    description: {
-                        $regex: searchKeyword,
-                        $options: "i"
-                    }
-                }
-            ]
-        }).sort({ createdAt: -1 });
+                ]
+            })
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             count: todos.length,
             todos
         });
+
     } catch (error) {
+
         console.error("Error searching todos:", error);
 
         res.status(500).json({
@@ -107,26 +148,40 @@ app.get("/api/todos/search", async (req, res) => {
     }
 });
 
+
+// =========================
 // Filter Todos
+// =========================
+
 app.get("/api/todos/filter", async (req, res) => {
+
     try {
+
         const { completed } = req.query;
 
-        if (completed !== "true" && completed !== "false") {
+        if (
+            completed !== "true" &&
+            completed !== "false"
+        ) {
+
             return res.status(400).json({
                 message: "Completed must be true or false"
             });
         }
 
-        const todos = await Todo.find({
-            completed: completed === "true"
-        }).sort({ createdAt: -1 });
+        const todos = await Todo
+            .find({
+                completed: completed === "true"
+            })
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             count: todos.length,
             todos
         });
+
     } catch (error) {
+
         console.error("Error filtering todos:", error);
 
         res.status(500).json({
@@ -135,14 +190,21 @@ app.get("/api/todos/filter", async (req, res) => {
     }
 });
 
+
+// =========================
 // Get Todo by ID
+// =========================
+
 app.get("/api/todos/:id", async (req, res) => {
+
     try {
+
         const { id } = req.params;
 
         const todo = await Todo.findById(id);
 
         if (!todo) {
+
             return res.status(404).json({
                 message: "Todo not found"
             });
@@ -151,7 +213,9 @@ app.get("/api/todos/:id", async (req, res) => {
         res.status(200).json({
             todo
         });
+
     } catch (error) {
+
         console.error("Error fetching todo:", error);
 
         res.status(500).json({
@@ -160,13 +224,21 @@ app.get("/api/todos/:id", async (req, res) => {
     }
 });
 
+
+// =========================
 // Update Todo
+// =========================
+
 app.put("/api/todos/:id", async (req, res) => {
+
     try {
+
         const { id } = req.params;
+
         const { title, description } = req.body;
 
-        if (!title) {
+        if (!title || !title.trim()) {
+
             return res.status(400).json({
                 message: "Title is required"
             });
@@ -175,8 +247,10 @@ app.put("/api/todos/:id", async (req, res) => {
         const todo = await Todo.findByIdAndUpdate(
             id,
             {
-                title,
-                description
+                title: title.trim(),
+                description: description
+                    ? description.trim()
+                    : ""
             },
             {
                 new: true,
@@ -185,6 +259,7 @@ app.put("/api/todos/:id", async (req, res) => {
         );
 
         if (!todo) {
+
             return res.status(404).json({
                 message: "Todo not found"
             });
@@ -194,7 +269,9 @@ app.put("/api/todos/:id", async (req, res) => {
             message: "Todo updated successfully",
             todo
         });
+
     } catch (error) {
+
         console.error("Error updating todo:", error);
 
         res.status(500).json({
@@ -203,14 +280,21 @@ app.put("/api/todos/:id", async (req, res) => {
     }
 });
 
+
+// =========================
 // Complete / Uncomplete Todo
+// =========================
+
 app.patch("/api/todos/:id/complete", async (req, res) => {
+
     try {
+
         const { id } = req.params;
 
         const todo = await Todo.findById(id);
 
         if (!todo) {
+
             return res.status(404).json({
                 message: "Todo not found"
             });
@@ -226,8 +310,13 @@ app.patch("/api/todos/:id/complete", async (req, res) => {
                 : "Todo marked as incomplete",
             todo
         });
+
     } catch (error) {
-        console.error("Error updating todo completion:", error);
+
+        console.error(
+            "Error updating todo completion:",
+            error
+        );
 
         res.status(500).json({
             message: "Failed to update todo completion"
@@ -235,14 +324,21 @@ app.patch("/api/todos/:id/complete", async (req, res) => {
     }
 });
 
+
+// =========================
 // Delete Todo
+// =========================
+
 app.delete("/api/todos/:id", async (req, res) => {
+
     try {
+
         const { id } = req.params;
 
         const todo = await Todo.findByIdAndDelete(id);
 
         if (!todo) {
+
             return res.status(404).json({
                 message: "Todo not found"
             });
@@ -252,7 +348,9 @@ app.delete("/api/todos/:id", async (req, res) => {
             message: "Todo deleted successfully",
             todo
         });
+
     } catch (error) {
+
         console.error("Error deleting todo:", error);
 
         res.status(500).json({
@@ -261,23 +359,59 @@ app.delete("/api/todos/:id", async (req, res) => {
     }
 });
 
+
+// =========================
+// Server Configuration
+// =========================
+
 const PORT = process.env.PORT || 5000;
 
-async function startServer() {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 10000
-        });
 
-        console.log("MongoDB connected successfully!");
+// =========================
+// Start Server
+// =========================
+
+async function startServer() {
+
+    try {
+
+        if (!process.env.MONGO_URI) {
+
+            throw new Error(
+                "MONGO_URI is not defined in environment variables."
+            );
+        }
+
+        await mongoose.connect(
+            process.env.MONGO_URI,
+            {
+                serverSelectionTimeoutMS: 10000
+            }
+        );
+
+        console.log(
+            "MongoDB connected successfully!"
+        );
 
         app.listen(PORT, () => {
-            console.log(`Server running at http://localhost:${PORT}`);
+
+            console.log(
+                `Server running at http://localhost:${PORT}`
+            );
+
         });
+
     } catch (error) {
-        console.error("MongoDB connection failed:");
+
+        console.error(
+            "MongoDB connection failed:"
+        );
+
         console.error(error);
+
+        process.exit(1);
     }
 }
+
 
 startServer();
