@@ -106,6 +106,34 @@ app.get("/api/todos/search", async (req, res) => {
     }
 });
 
+// Filter Todos
+app.get("/api/todos/filter", async (req, res) => {
+    try {
+        const { completed } = req.query;
+
+        if (completed !== "true" && completed !== "false") {
+            return res.status(400).json({
+                message: "Completed must be true or false"
+            });
+        }
+
+        const todos = await Todo.find({
+            completed: completed === "true"
+        }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            count: todos.length,
+            todos
+        });
+    } catch (error) {
+        console.error("Error filtering todos:", error);
+
+        res.status(500).json({
+            message: "Failed to filter todos"
+        });
+    }
+});
+
 // Get Todo by ID
 app.get("/api/todos/:id", async (req, res) => {
     try {
