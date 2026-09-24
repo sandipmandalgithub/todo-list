@@ -102,6 +102,74 @@
 
     </div>
 
+    <!-- Edit Todo Modal -->
+    <div id="editModal" class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2>Edit Todo</h2>
+
+                <button
+                    type="button"
+                    id="closeModalButton"
+                    class="close-modal-button"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <form id="editTodoForm">
+
+                <div class="form-group">
+                    <label for="editTitle">Title</label>
+
+                    <input
+                        type="text"
+                        id="editTitle"
+                        name="editTitle"
+                        placeholder="Enter todo title"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+
+                    <textarea
+                        id="editDescription"
+                        name="editDescription"
+                        placeholder="Enter todo description"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        id="cancelEditButton"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="updateTodoButton"
+                        class="update-button"
+                    >
+                        Update Todo
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
     <script src="script.js"></script>
 
 </body>

@@ -13,6 +13,16 @@ const titleInput = document.getElementById("title");
 const descriptionInput = document.getElementById("description");
 const addTodoButton = document.getElementById("addTodoButton");
 
+const editModal = document.getElementById("editModal");
+const editTodoForm = document.getElementById("editTodoForm");
+const editTitleInput = document.getElementById("editTitle");
+const editDescriptionInput = document.getElementById("editDescription");
+const updateTodoButton = document.getElementById("updateTodoButton");
+const closeModalButton = document.getElementById("closeModalButton");
+const cancelEditButton = document.getElementById("cancelEditButton");
+
+let editingTodoId = null;
+
 
 // Load Todos
 async function loadTodos() {
@@ -81,6 +91,13 @@ function displayTodos(todos) {
                     onclick="toggleTodo('${todo._id}')"
                 >
                     ${todo.completed ? "Mark as Pending" : "Mark as Complete"}
+                </button>
+
+                <button
+                    class="edit-button"
+                    onclick="openEditModal('${todo._id}')"
+                >
+                    Edit
                 </button>
 
                 <button
@@ -172,6 +189,149 @@ todoForm.addEventListener("submit", async (event) => {
 
         addTodoButton.disabled = false;
         addTodoButton.textContent = "Add Todo";
+    }
+});
+
+
+// Open Edit Modal
+async function openEditModal(id) {
+
+    try {
+
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+
+        const response = await fetch(`/api/todos/${id}`);
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to fetch todo"
+            );
+        }
+
+        const todo = data.todo;
+
+        editingTodoId = todo._id;
+
+        editTitleInput.value = todo.title;
+        editDescriptionInput.value = todo.description || "";
+
+        editModal.classList.add("show");
+
+        editTitleInput.focus();
+
+    } catch (error) {
+
+        console.error("Error opening edit modal:", error);
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+    }
+}
+
+
+// Close Edit Modal
+function closeEditModal() {
+
+    editModal.classList.remove("show");
+
+    editingTodoId = null;
+
+    editTodoForm.reset();
+}
+
+
+// Update Todo
+editTodoForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const title = editTitleInput.value.trim();
+    const description = editDescriptionInput.value.trim();
+
+    if (!title) {
+        errorMessage.textContent = "Title is required.";
+        errorMessage.style.display = "block";
+        return;
+    }
+
+    if (!editingTodoId) {
+        errorMessage.textContent = "No todo selected.";
+        errorMessage.style.display = "block";
+        return;
+    }
+
+    try {
+
+        updateTodoButton.disabled = true;
+        updateTodoButton.textContent = "Updating...";
+
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+
+        const response = await fetch(
+            `/api/todos/${editingTodoId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title,
+                    description
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to update todo"
+            );
+        }
+
+        closeEditModal();
+
+        successMessage.textContent = "Todo updated successfully!";
+        successMessage.style.display = "block";
+
+        await loadTodos();
+
+    } catch (error) {
+
+        console.error("Error updating todo:", error);
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+
+    } finally {
+
+        updateTodoButton.disabled = false;
+        updateTodoButton.textContent = "Update Todo";
+    }
+});
+
+
+// Close modal using X button
+closeModalButton.addEventListener("click", () => {
+    closeEditModal();
+});
+
+
+// Close modal using Cancel button
+cancelEditButton.addEventListener("click", () => {
+    closeEditModal();
+});
+
+
+// Close modal when clicking outside modal content
+editModal.addEventListener("click", (event) => {
+
+    if (event.target === editModal) {
+        closeEditModal();
     }
 });
 

@@ -234,9 +234,120 @@ body {
     color: #ffffff;
 }
 
+.edit-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
 .delete-button {
     background: #d92d20;
     color: #ffffff;
+}
+
+/* Edit Modal */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 550px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    font-size: 24px;
+}
+
+.close-modal-button {
+    border: none;
+    background: transparent;
+    color: #666;
+
+    font-size: 30px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    padding: 2px 8px;
+}
+
+.close-modal-button:hover {
+    color: #222;
+}
+
+/* Modal Actions */
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 7px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #e5e7eb;
+    color: #222;
+}
+
+.cancel-button:hover {
+    background: #d1d5db;
+}
+
+.update-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.update-button:hover {
+    opacity: 0.9;
+}
+
+.update-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Mobile */
@@ -266,6 +377,26 @@ body {
     }
 
     .todo-actions button {
+        width: 100%;
+    }
+
+    .modal {
+        padding: 15px;
+    }
+
+    .modal-content {
+        padding: 18px;
+    }
+
+    .modal-header h2 {
+        font-size: 21px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions button {
         width: 100%;
     }
 }
