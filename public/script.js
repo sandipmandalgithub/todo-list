@@ -17,6 +17,8 @@ const searchInput = document.getElementById("searchInput");
 const filterSelect = document.getElementById("filterSelect");
 const clearFilterButton = document.getElementById("clearFilterButton");
 
+const emptyState = document.getElementById("emptyState");
+
 const editModal = document.getElementById("editModal");
 const editTodoForm = document.getElementById("editTodoForm");
 const editTitleInput = document.getElementById("editTitle");
@@ -26,6 +28,26 @@ const closeModalButton = document.getElementById("closeModalButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
 
 let editingTodoId = null;
+
+
+// Show Empty State
+function showEmptyState(message, description) {
+
+    todoList.innerHTML = "";
+
+    emptyState.querySelector("h3").textContent = message;
+
+    emptyState.querySelector("p").textContent = description;
+
+    emptyState.style.display = "block";
+}
+
+
+// Hide Empty State
+function hideEmptyState() {
+
+    emptyState.style.display = "none";
+}
 
 
 // Load Todos
@@ -146,10 +168,8 @@ async function applySearchAndFilter() {
     const filter = filterSelect.value;
 
     /*
-        If search keyword exists,
-        search API will be used first.
-
-        Otherwise filter API will be used.
+        Search takes priority when a keyword is entered.
+        Otherwise the selected filter is applied.
     */
 
     if (keyword) {
@@ -177,12 +197,42 @@ function displayTodos(todos) {
 
     if (todos.length === 0) {
 
-        todoList.innerHTML = `
-            <p>No todos found.</p>
-        `;
+        const keyword = searchInput.value.trim();
+        const filter = filterSelect.value;
+
+        if (keyword) {
+
+            showEmptyState(
+                "No matching todos",
+                `No tasks found for "${keyword}". Try a different search.`
+            );
+
+        } else if (filter === "completed") {
+
+            showEmptyState(
+                "No completed todos",
+                "You don't have any completed tasks yet."
+            );
+
+        } else if (filter === "pending") {
+
+            showEmptyState(
+                "No pending todos",
+                "You don't have any pending tasks right now."
+            );
+
+        } else {
+
+            showEmptyState(
+                "No todos found",
+                "Create your first todo to start managing your tasks."
+            );
+        }
 
         return;
     }
+
+    hideEmptyState();
 
     todos.forEach((todo) => {
 
@@ -296,10 +346,15 @@ todoForm.addEventListener("submit", async (event) => {
             );
         }
 
-        successMessage.textContent = "Todo added successfully!";
+        successMessage.textContent =
+            "Todo added successfully!";
+
         successMessage.style.display = "block";
 
         todoForm.reset();
+
+        searchInput.value = "";
+        filterSelect.value = "all";
 
         await loadTodos();
 
