@@ -63,6 +63,49 @@ app.get("/api/todos", async (req, res) => {
     }
 });
 
+// Search Todos
+app.get("/api/todos/search", async (req, res) => {
+    try {
+        const { keyword } = req.query;
+
+        if (!keyword || !keyword.trim()) {
+            return res.status(400).json({
+                message: "Keyword is required"
+            });
+        }
+
+        const searchKeyword = keyword.trim();
+
+        const todos = await Todo.find({
+            $or: [
+                {
+                    title: {
+                        $regex: searchKeyword,
+                        $options: "i"
+                    }
+                },
+                {
+                    description: {
+                        $regex: searchKeyword,
+                        $options: "i"
+                    }
+                }
+            ]
+        }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            count: todos.length,
+            todos
+        });
+    } catch (error) {
+        console.error("Error searching todos:", error);
+
+        res.status(500).json({
+            message: "Failed to search todos"
+        });
+    }
+});
+
 // Get Todo by ID
 app.get("/api/todos/:id", async (req, res) => {
     try {
