@@ -75,6 +75,45 @@
 
         </section>
 
+        <!-- Search and Filter -->
+        <section class="search-filter-section">
+
+            <div class="search-box">
+
+                <label for="searchInput">Search Todos</label>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by title or description..."
+                >
+
+            </div>
+
+            <div class="filter-box">
+
+                <label for="filterSelect">Filter</label>
+
+                <select id="filterSelect">
+
+                    <option value="all">All Todos</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+
+                </select>
+
+            </div>
+
+            <button
+                type="button"
+                id="clearFilterButton"
+                class="clear-filter-button"
+            >
+                Clear
+            </button>
+
+        </section>
+
         <!-- Loading -->
         <div id="loadingMessage" class="message loading-message">
             Loading todos...
@@ -108,6 +147,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
+
                 <h2>Edit Todo</h2>
 
                 <button
@@ -117,12 +157,16 @@
                 >
                     &times;
                 </button>
+
             </div>
 
             <form id="editTodoForm">
 
                 <div class="form-group">
-                    <label for="editTitle">Title</label>
+
+                    <label for="editTitle">
+                        Title
+                    </label>
 
                     <input
                         type="text"
@@ -131,10 +175,14 @@
                         placeholder="Enter todo title"
                         required
                     >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="editDescription">Description</label>
+
+                    <label for="editDescription">
+                        Description
+                    </label>
 
                     <textarea
                         id="editDescription"
@@ -142,6 +190,7 @@
                         placeholder="Enter todo description"
                         rows="4"
                     ></textarea>
+
                 </div>
 
                 <div class="modal-actions">

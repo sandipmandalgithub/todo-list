@@ -86,7 +86,9 @@ body {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.search-box input,
+.filter-box select {
     width: 100%;
     padding: 12px;
     border: 1px solid #d0d5d9;
@@ -97,7 +99,9 @@ body {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.search-box input:focus,
+.filter-box select:focus {
     border-color: #555;
 }
 
@@ -124,6 +128,49 @@ body {
 #addTodoButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Search and Filter */
+
+.search-filter-section {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+
+    display: grid;
+    grid-template-columns: 1fr 220px auto;
+    gap: 15px;
+    align-items: end;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.search-box label,
+.filter-box label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+
+.clear-filter-button {
+    height: 42px;
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #e5e7eb;
+    color: #222;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.clear-filter-button:hover {
+    background: #d1d5db;
 }
 
 /* Messages */
@@ -266,6 +313,7 @@ body {
 .modal-content {
     width: 100%;
     max-width: 550px;
+
     background: #ffffff;
     border-radius: 12px;
     padding: 25px;
@@ -350,6 +398,19 @@ body {
     cursor: not-allowed;
 }
 
+/* Tablet */
+
+@media (max-width: 800px) {
+
+    .search-filter-section {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .clear-filter-button {
+        width: 100%;
+    }
+}
+
 /* Mobile */
 
 @media (max-width: 700px) {
@@ -369,6 +430,11 @@ body {
 
     .add-todo-section,
     .todo-section {
+        padding: 18px;
+    }
+
+    .search-filter-section {
+        grid-template-columns: 1fr;
         padding: 18px;
     }
 

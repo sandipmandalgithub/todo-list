@@ -13,6 +13,10 @@ const titleInput = document.getElementById("title");
 const descriptionInput = document.getElementById("description");
 const addTodoButton = document.getElementById("addTodoButton");
 
+const searchInput = document.getElementById("searchInput");
+const filterSelect = document.getElementById("filterSelect");
+const clearFilterButton = document.getElementById("clearFilterButton");
+
 const editModal = document.getElementById("editModal");
 const editTodoForm = document.getElementById("editTodoForm");
 const editTitleInput = document.getElementById("editTitle");
@@ -26,7 +30,9 @@ let editingTodoId = null;
 
 // Load Todos
 async function loadTodos() {
+
     try {
+
         loadingMessage.style.display = "block";
         errorMessage.style.display = "none";
 
@@ -46,20 +52,131 @@ async function loadTodos() {
         loadingMessage.style.display = "none";
 
     } catch (error) {
+
         console.error("Error loading todos:", error);
 
         loadingMessage.style.display = "none";
+
         errorMessage.textContent = "Failed to load todos.";
         errorMessage.style.display = "block";
     }
 }
 
 
+// Search Todos
+async function searchTodos(keyword) {
+
+    try {
+
+        loadingMessage.style.display = "block";
+        errorMessage.style.display = "none";
+
+        const response = await fetch(
+            `/api/todos/search?keyword=${encodeURIComponent(keyword)}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to search todos"
+            );
+        }
+
+        displayTodos(data.todos);
+        updateCounter(data.todos);
+
+        loadingMessage.style.display = "none";
+
+    } catch (error) {
+
+        console.error("Error searching todos:", error);
+
+        loadingMessage.style.display = "none";
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+    }
+}
+
+
+// Filter Todos
+async function filterTodos(status) {
+
+    try {
+
+        loadingMessage.style.display = "block";
+        errorMessage.style.display = "none";
+
+        const completed = status === "completed";
+
+        const response = await fetch(
+            `/api/todos/filter?completed=${completed}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to filter todos"
+            );
+        }
+
+        displayTodos(data.todos);
+        updateCounter(data.todos);
+
+        loadingMessage.style.display = "none";
+
+    } catch (error) {
+
+        console.error("Error filtering todos:", error);
+
+        loadingMessage.style.display = "none";
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+    }
+}
+
+
+// Apply Search / Filter
+async function applySearchAndFilter() {
+
+    const keyword = searchInput.value.trim();
+    const filter = filterSelect.value;
+
+    /*
+        If search keyword exists,
+        search API will be used first.
+
+        Otherwise filter API will be used.
+    */
+
+    if (keyword) {
+
+        await searchTodos(keyword);
+
+        return;
+    }
+
+    if (filter === "all") {
+
+        await loadTodos();
+
+        return;
+    }
+
+    await filterTodos(filter);
+}
+
+
 // Display Todos
 function displayTodos(todos) {
+
     todoList.innerHTML = "";
 
     if (todos.length === 0) {
+
         todoList.innerHTML = `
             <p>No todos found.</p>
         `;
@@ -141,8 +258,10 @@ todoForm.addEventListener("submit", async (event) => {
     const description = descriptionInput.value.trim();
 
     if (!title) {
+
         errorMessage.textContent = "Title is required.";
         errorMessage.style.display = "block";
+
         return;
     }
 
@@ -155,10 +274,13 @@ todoForm.addEventListener("submit", async (event) => {
         successMessage.style.display = "none";
 
         const response = await fetch("/api/todos", {
+
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 title,
                 description
@@ -168,7 +290,10 @@ todoForm.addEventListener("submit", async (event) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || "Failed to create todo");
+
+            throw new Error(
+                data.message || "Failed to create todo"
+            );
         }
 
         successMessage.textContent = "Todo added successfully!";
@@ -193,6 +318,30 @@ todoForm.addEventListener("submit", async (event) => {
 });
 
 
+// Search Input
+searchInput.addEventListener("input", () => {
+
+    applySearchAndFilter();
+});
+
+
+// Filter Select
+filterSelect.addEventListener("change", () => {
+
+    applySearchAndFilter();
+});
+
+
+// Clear Search and Filter
+clearFilterButton.addEventListener("click", () => {
+
+    searchInput.value = "";
+    filterSelect.value = "all";
+
+    applySearchAndFilter();
+});
+
+
 // Open Edit Modal
 async function openEditModal(id) {
 
@@ -206,6 +355,7 @@ async function openEditModal(id) {
         const data = await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.message || "Failed to fetch todo"
             );
@@ -252,14 +402,18 @@ editTodoForm.addEventListener("submit", async (event) => {
     const description = editDescriptionInput.value.trim();
 
     if (!title) {
+
         errorMessage.textContent = "Title is required.";
         errorMessage.style.display = "block";
+
         return;
     }
 
     if (!editingTodoId) {
+
         errorMessage.textContent = "No todo selected.";
         errorMessage.style.display = "block";
+
         return;
     }
 
@@ -275,9 +429,11 @@ editTodoForm.addEventListener("submit", async (event) => {
             `/api/todos/${editingTodoId}`,
             {
                 method: "PUT",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
                     title,
                     description
@@ -288,6 +444,7 @@ editTodoForm.addEventListener("submit", async (event) => {
         const data = await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.message || "Failed to update todo"
             );
@@ -295,10 +452,12 @@ editTodoForm.addEventListener("submit", async (event) => {
 
         closeEditModal();
 
-        successMessage.textContent = "Todo updated successfully!";
+        successMessage.textContent =
+            "Todo updated successfully!";
+
         successMessage.style.display = "block";
 
-        await loadTodos();
+        await applySearchAndFilter();
 
     } catch (error) {
 
@@ -317,12 +476,14 @@ editTodoForm.addEventListener("submit", async (event) => {
 
 // Close modal using X button
 closeModalButton.addEventListener("click", () => {
+
     closeEditModal();
 });
 
 
 // Close modal using Cancel button
 cancelEditButton.addEventListener("click", () => {
+
     closeEditModal();
 });
 
@@ -331,6 +492,7 @@ cancelEditButton.addEventListener("click", () => {
 editModal.addEventListener("click", (event) => {
 
     if (event.target === editModal) {
+
         closeEditModal();
     }
 });
@@ -344,13 +506,17 @@ async function toggleTodo(id) {
         errorMessage.style.display = "none";
         successMessage.style.display = "none";
 
-        const response = await fetch(`/api/todos/${id}/complete`, {
-            method: "PATCH"
-        });
+        const response = await fetch(
+            `/api/todos/${id}/complete`,
+            {
+                method: "PATCH"
+            }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.message || "Failed to update todo"
             );
@@ -359,11 +525,14 @@ async function toggleTodo(id) {
         successMessage.textContent = data.message;
         successMessage.style.display = "block";
 
-        await loadTodos();
+        await applySearchAndFilter();
 
     } catch (error) {
 
-        console.error("Error updating todo:", error);
+        console.error(
+            "Error updating todo:",
+            error
+        );
 
         errorMessage.textContent = error.message;
         errorMessage.style.display = "block";
@@ -387,26 +556,35 @@ async function deleteTodo(id) {
         errorMessage.style.display = "none";
         successMessage.style.display = "none";
 
-        const response = await fetch(`/api/todos/${id}`, {
-            method: "DELETE"
-        });
+        const response = await fetch(
+            `/api/todos/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.message || "Failed to delete todo"
             );
         }
 
-        successMessage.textContent = "Todo deleted successfully!";
+        successMessage.textContent =
+            "Todo deleted successfully!";
+
         successMessage.style.display = "block";
 
-        await loadTodos();
+        await applySearchAndFilter();
 
     } catch (error) {
 
-        console.error("Error deleting todo:", error);
+        console.error(
+            "Error deleting todo:",
+            error
+        );
 
         errorMessage.textContent = error.message;
         errorMessage.style.display = "block";
