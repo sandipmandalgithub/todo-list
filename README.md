@@ -8,7 +8,9 @@ The application allows users to create, view, search, filter, edit, complete and
 
 ## 🚀 Live Project
 
-Live Demo: Coming Soon
+Live Demo: 
+
+https://todo-list-vspv.onrender.com
 
 GitHub Repository:
 
