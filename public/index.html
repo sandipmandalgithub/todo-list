@@ -17,7 +17,7 @@
             <p>Manage your daily tasks easily</p>
         </header>
 
-        <!-- Todo Counter -->
+        <!-- Counter -->
         <section class="counter-section">
 
             <div class="counter-card">
@@ -37,14 +37,56 @@
 
         </section>
 
-        <!-- Loading Message -->
+        <!-- Add Todo Form -->
+        <section class="add-todo-section">
+
+            <h2>Add New Todo</h2>
+
+            <form id="todoForm">
+
+                <div class="form-group">
+                    <label for="title">Title</label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="Enter todo title"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Enter todo description"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <button type="submit" id="addTodoButton">
+                    Add Todo
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- Loading -->
         <div id="loadingMessage" class="message loading-message">
             Loading todos...
         </div>
 
-        <!-- Error Message -->
+        <!-- Error -->
         <div id="errorMessage" class="message error-message">
             Failed to load todos.
+        </div>
+
+        <!-- Success -->
+        <div id="successMessage" class="message success-message">
         </div>
 
         <!-- Todo List -->
@@ -53,7 +95,7 @@
             <h2>My Todos</h2>
 
             <div id="todoList" class="todo-list">
-                <!-- Todos will be added here using JavaScript -->
+                <!-- Todos will be added here -->
             </div>
 
         </section>

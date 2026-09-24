@@ -6,7 +6,15 @@ const pendingCount = document.getElementById("pendingCount");
 
 const loadingMessage = document.getElementById("loadingMessage");
 const errorMessage = document.getElementById("errorMessage");
+const successMessage = document.getElementById("successMessage");
 
+const todoForm = document.getElementById("todoForm");
+const titleInput = document.getElementById("title");
+const descriptionInput = document.getElementById("description");
+const addTodoButton = document.getElementById("addTodoButton");
+
+
+// Load Todos
 async function loadTodos() {
     try {
         loadingMessage.style.display = "block";
@@ -31,10 +39,13 @@ async function loadTodos() {
         console.error("Error loading todos:", error);
 
         loadingMessage.style.display = "none";
+        errorMessage.textContent = "Failed to load todos.";
         errorMessage.style.display = "block";
     }
 }
 
+
+// Display Todos
 function displayTodos(todos) {
     todoList.innerHTML = "";
 
@@ -68,6 +79,8 @@ function displayTodos(todos) {
     });
 }
 
+
+// Update Counter
 function updateCounter(todos) {
 
     const total = todos.length;
@@ -83,4 +96,67 @@ function updateCounter(todos) {
     pendingCount.textContent = pending;
 }
 
+
+// Add Todo
+todoForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const title = titleInput.value.trim();
+    const description = descriptionInput.value.trim();
+
+    if (!title) {
+        errorMessage.textContent = "Title is required.";
+        errorMessage.style.display = "block";
+        return;
+    }
+
+    try {
+
+        addTodoButton.disabled = true;
+        addTodoButton.textContent = "Adding...";
+
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+
+        const response = await fetch("/api/todos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title,
+                description
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to create todo");
+        }
+
+        successMessage.textContent = "Todo added successfully!";
+        successMessage.style.display = "block";
+
+        todoForm.reset();
+
+        await loadTodos();
+
+    } catch (error) {
+
+        console.error("Error creating todo:", error);
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+
+    } finally {
+
+        addTodoButton.disabled = false;
+        addTodoButton.textContent = "Add Todo";
+    }
+});
+
+
+// Initial Load
 loadTodos();
