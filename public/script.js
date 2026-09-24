@@ -70,9 +70,27 @@ function displayTodos(todos) {
                 ${todo.description || "No description"}
             </p>
 
-            <span class="todo-status">
+            <span class="todo-status ${todo.completed ? "completed" : "pending"}">
                 ${todo.completed ? "Completed" : "Pending"}
             </span>
+
+            <div class="todo-actions">
+
+                <button
+                    class="complete-button"
+                    onclick="toggleTodo('${todo._id}')"
+                >
+                    ${todo.completed ? "Mark as Pending" : "Mark as Complete"}
+                </button>
+
+                <button
+                    class="delete-button"
+                    onclick="deleteTodo('${todo._id}')"
+                >
+                    Delete
+                </button>
+
+            </div>
         `;
 
         todoList.appendChild(todoCard);
@@ -156,6 +174,84 @@ todoForm.addEventListener("submit", async (event) => {
         addTodoButton.textContent = "Add Todo";
     }
 });
+
+
+// Complete / Uncomplete Todo
+async function toggleTodo(id) {
+
+    try {
+
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+
+        const response = await fetch(`/api/todos/${id}/complete`, {
+            method: "PATCH"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to update todo"
+            );
+        }
+
+        successMessage.textContent = data.message;
+        successMessage.style.display = "block";
+
+        await loadTodos();
+
+    } catch (error) {
+
+        console.error("Error updating todo:", error);
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+    }
+}
+
+
+// Delete Todo
+async function deleteTodo(id) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this todo?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+
+        const response = await fetch(`/api/todos/${id}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to delete todo"
+            );
+        }
+
+        successMessage.textContent = "Todo deleted successfully!";
+        successMessage.style.display = "block";
+
+        await loadTodos();
+
+    } catch (error) {
+
+        console.error("Error deleting todo:", error);
+
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
+    }
+}
 
 
 // Initial Load
